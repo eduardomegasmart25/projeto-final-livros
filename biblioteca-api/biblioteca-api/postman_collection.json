@@ -1,0 +1,174 @@
+{
+  "info": {
+    "name": "Biblioteca API - Cadastro e Empréstimos",
+    "description": "Collection para testar a API de cadastro e empréstimo de livros",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "livroId", "value": "" },
+    { "key": "usuarioId", "value": "" },
+    { "key": "emprestimoId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Status da API",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/"
+      }
+    },
+    {
+      "name": "Livros",
+      "item": [
+        {
+          "name": "Criar livro",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/livros",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Dom Casmurro\",\n  \"autor\": \"Machado de Assis\",\n  \"isbn\": \"978-85-359-0277-5\",\n  \"categoria\": \"Romance\",\n  \"anoPublicacao\": 1899,\n  \"quantidadeTotal\": 3\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar livros",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/livros"
+          }
+        },
+        {
+          "name": "Buscar livro por título (query)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/livros?titulo=Dom"
+          }
+        },
+        {
+          "name": "Buscar livro por ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/livros/{{livroId}}"
+          }
+        },
+        {
+          "name": "Atualizar livro",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/livros/{{livroId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoria\": \"Literatura Brasileira\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Excluir livro",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/livros/{{livroId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuários",
+      "item": [
+        {
+          "name": "Criar usuário",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/usuarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"João Silva\",\n  \"email\": \"joao.silva@email.com\",\n  \"telefone\": \"42999998888\",\n  \"matricula\": \"2026001\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar usuários",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/usuarios"
+          }
+        },
+        {
+          "name": "Buscar usuário por ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/usuarios/{{usuarioId}}"
+          }
+        },
+        {
+          "name": "Atualizar usuário",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/usuarios/{{usuarioId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefone\": \"42988887777\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Excluir usuário",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/usuarios/{{usuarioId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Empréstimos",
+      "item": [
+        {
+          "name": "Criar empréstimo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/emprestimos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"livroId\": \"{{livroId}}\",\n  \"usuarioId\": \"{{usuarioId}}\",\n  \"diasParaDevolucao\": 7\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar empréstimos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/emprestimos"
+          }
+        },
+        {
+          "name": "Listar empréstimos atrasados",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/emprestimos/atrasados"
+          }
+        },
+        {
+          "name": "Buscar empréstimo por ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/emprestimos/{{emprestimoId}}"
+          }
+        },
+        {
+          "name": "Devolver livro (registrar devolução)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/emprestimos/{{emprestimoId}}/devolver"
+          }
+        }
+      ]
+    }
+  ]
+}
