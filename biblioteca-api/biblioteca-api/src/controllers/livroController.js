@@ -29,7 +29,7 @@ async function criarLivro(req, res) {
 // Listar todos os livros (com filtro opcional por título/autor/categoria)
 async function listarLivros(req, res) {
   try {
-    const { titulo, autor, categoria, disponivel } = req.query;
+    const { titulo, autor, categoria, disponivel, page = 1, limit = 10 } = req.query;
     const filtro = {};
 
     if (titulo) filtro.titulo = { $regex: titulo, $options: "i" };
@@ -37,8 +37,21 @@ async function listarLivros(req, res) {
     if (categoria) filtro.categoria = { $regex: categoria, $options: "i" };
     if (disponivel === "true") filtro.quantidadeDisponivel = { $gt: 0 };
 
-    const livros = await Livro.find(filtro).sort({ titulo: 1 });
-    return res.status(200).json(livros);
+    const pagina = Math.max(parseInt(page, 10) || 1, 1);
+    const limite = Math.min(Math.max(parseInt(limit, 10) || 10, 1), 100);
+    const totalItens = await Livro.countDocuments(filtro);
+    const livros = await Livro.find(filtro)
+      .sort({ titulo: 1 })
+      .skip((pagina - 1) * limite)
+      .limit(limite);
+
+    return res.status(200).json({
+      items: livros,
+      totalItens,
+      totalPaginas: Math.ceil(totalItens / limite),
+      pagina,
+      limite,
+    });
   } catch (erro) {
     return res.status(500).json({ erro: erro.message });
   }

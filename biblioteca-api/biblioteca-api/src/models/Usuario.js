@@ -14,6 +14,10 @@ const usuarioSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
     },
+    senhaHash: {
+      type: String,
+      required: [true, "A senha é obrigatória"],
+    },
     telefone: {
       type: String,
       trim: true,
@@ -25,6 +29,11 @@ const usuarioSchema = new mongoose.Schema(
     ativo: {
       type: Boolean,
       default: true,
+    },
+    role: {
+      type: String,
+      enum: ["usuario", "bibliotecario"],
+      default: "usuario",
     },
   },
   { timestamps: true }

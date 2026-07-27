@@ -7,11 +7,13 @@ const {
   atualizarLivro,
   excluirLivro,
 } = require("../controllers/livroController");
+const autenticarToken = require("../middlewares/authMiddleware");
+const autorizarRoles = require("../middlewares/roleMiddleware");
 
-router.post("/", criarLivro);
 router.get("/", listarLivros);
 router.get("/:id", buscarLivroPorId);
-router.put("/:id", atualizarLivro);
-router.delete("/:id", excluirLivro);
+router.post("/", autenticarToken, autorizarRoles("bibliotecario"), criarLivro);
+router.put("/:id", autenticarToken, autorizarRoles("bibliotecario"), atualizarLivro);
+router.delete("/:id", autenticarToken, autorizarRoles("bibliotecario"), excluirLivro);
 
 module.exports = router;

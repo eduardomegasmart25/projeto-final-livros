@@ -1,139 +1,305 @@
 # 📚 Biblioteca API — Sistema de Cadastro e Empréstimo de Livros
 
-Projeto final de curso: API REST em **Node.js + Express + MongoDB (Mongoose)** para cadastro de livros, usuários e controle de empréstimos.
+## 🎯 Objetivo do projeto
+
+Este projeto tem como finalidade desenvolver uma API REST para o gerenciamento de uma biblioteca, permitindo o cadastro de livros, usuários e empréstimos, com foco em organização, segurança e facilidade de uso.
+
+A aplicação foi construída com Node.js, Express e MongoDB, seguindo boas práticas de estruturação, autenticação e validação de dados.
+
+## ✨ Funcionalidades implementadas
+
+- Cadastro, listagem, busca, atualização e remoção de livros
+- Cadastro, listagem, busca, atualização e remoção de usuários
+- Registro de empréstimos e devoluções
+- Controle de disponibilidade de exemplares
+- Autenticação com JWT para login de bibliotecário/usuário
+- Proteção de rotas sensíveis por perfil
+- Paginação nas listagens de livros e usuários
+- Validação de dados com Joi
+- Testes automatizados com Jest + Supertest
+- Configuração para deploy no Render
 
 ## 🧱 Estrutura do projeto
 
-```
+```text
 biblioteca-api/
-├── server.js                 # ponto de entrada
 ├── package.json
+├── server.js
+├── render.yaml
 ├── .env.example
-├── postman_collection.json   # collection pronta para importar no Postman
+├── postman_collection.json
+├── tests/
+│   └── api.test.js
 └── src/
-    ├── app.js                # configuração do Express
+    ├── app.js
     ├── config/
-    │   └── db.js              # conexão com o MongoDB
-    ├── models/
-    │   ├── Livro.js
-    │   ├── Usuario.js
-    │   └── Emprestimo.js
+    │   └── db.js
     ├── controllers/
+    │   ├── authController.js
+    │   ├── emprestimoController.js
     │   ├── livroController.js
-    │   ├── usuarioController.js
-    │   └── emprestimoController.js
-    └── routes/
-        ├── livroRoutes.js
-        ├── usuarioRoutes.js
-        └── emprestimoRoutes.js
+    │   └── usuarioController.js
+    ├── middlewares/
+    │   ├── authMiddleware.js
+    │   ├── roleMiddleware.js
+    │   └── validateMiddleware.js
+    ├── models/
+    │   ├── Emprestimo.js
+    │   ├── Livro.js
+    │   └── Usuario.js
+    ├── routes/
+    │   ├── authRoutes.js
+    │   ├── emprestimoRoutes.js
+    │   ├── livroRoutes.js
+    │   └── usuarioRoutes.js
+    └── validators/
+        └── usuarioValidator.js
 ```
 
-## ⚙️ Pré-requisitos
+## ⚙️ Requisitos técnicos
 
-- Node.js instalado (v18+)
-- MongoDB instalado localmente **ou** uma conta gratuita no [MongoDB Atlas](https://www.mongodb.com/atlas)
-- Postman instalado
+- Node.js 18 ou superior
+- MongoDB local ou conta no MongoDB Atlas
+- Postman ou Insomnia para testes das rotas
+- Git para versionamento
 
-## 🚀 Como rodar o projeto
+## 🚀 Passo a passo para execução local
 
-1. Extraia os arquivos e abra a pasta no terminal.
+1. Clone o repositório:
+   ```bash
+   git clone <url-do-repositorio>
+   cd biblioteca-api
+   ```
 
 2. Instale as dependências:
    ```bash
    npm install
    ```
 
-3. Configure as variáveis de ambiente:
-   - Renomeie `.env.example` para `.env`
-   - Ajuste `MONGO_URI` para o seu MongoDB local ou Atlas
-
-4. Inicie o MongoDB local (se não estiver usando Atlas):
-   ```bash
-   mongod
+3. Crie o arquivo `.env` com base no `.env.example`:
+   ```env
+   PORT=3000
+   MONGO_URI=mongodb://127.0.0.1:27017/biblioteca
+   JWT_SECRET=sua-chave-segura
+   NODE_ENV=development
    ```
 
-5. Rode o servidor:
+4. Inicie o servidor:
    ```bash
    npm start
    ```
-   ou, para reiniciar automaticamente a cada alteração:
+
+   Ou em modo de desenvolvimento:
    ```bash
    npm run dev
    ```
 
-6. Você verá no terminal:
+5. A API ficará disponível em:
+   ```text
+   http://localhost:3000
    ```
-   MongoDB conectado com sucesso!
-   Servidor rodando em http://localhost:3000
+
+## 🧪 Como podem testar
+
+### Opção 1: teste local
+Cada integrante pode seguir estes passos:
+
+1. Clonar o projeto:
+   ```bash
+   git clone <url-do-repositorio>
+   cd biblioteca-api
    ```
 
-## 🧪 Como testar no Postman
+2. Instalar dependências:
+   ```bash
+   npm install
+   ```
 
-1. Abra o Postman.
-2. Clique em **Import** → selecione o arquivo `postman_collection.json`.
-3. A collection **"Biblioteca API - Cadastro e Empréstimos"** vai aparecer com 3 pastas: Livros, Usuários e Empréstimos.
-4. Ela já usa uma variável `{{baseUrl}}` apontando para `http://localhost:3000` — não precisa reescrever a URL em cada requisição.
+3. Criar o arquivo `.env` com os valores acima.
 
-### Fluxo sugerido de teste
+4. Rodar a API:
+   ```bash
+   npm start
+   ```
 
-1. **Criar livro** (`POST /api/livros`) → copie o `_id` retornado.
-2. **Criar usuário** (`POST /api/usuarios`) → copie o `_id` retornado.
-3. Nas variáveis da collection (ou direto na URL), cole os IDs em `livroId` e `usuarioId`.
-4. **Criar empréstimo** (`POST /api/emprestimos`) enviando `livroId` e `usuarioId` → copie o `_id` do empréstimo.
-5. **Listar empréstimos** (`GET /api/emprestimos`) para conferir que o livro ficou com `quantidadeDisponivel` reduzida.
-6. **Devolver livro** (`PUT /api/emprestimos/:id/devolver`) → confira que `quantidadeDisponivel` do livro voltou a subir e o status virou `devolvido`.
+5. Usar o Postman/Insomnia para testar as rotas.
 
-## 📌 Rotas disponíveis
+### Opção 2: testar via deploy
+Se a API já estiver publicada no Render, o grupo pode testar diretamente pela URL gerada, por exemplo:
+```text
+https://seu-app.onrender.com
+```
 
-### Livros — `/api/livros`
+### Fluxo recomendado para testar o projeto
+1. Criar um usuário:
+   ```http
+   POST /api/usuarios
+   ```
+   Body:
+   ```json
+   {
+     "nome": "Ana",
+     "email": "ana@email.com",
+     "senha": "123456",
+     "role": "bibliotecario"
+   }
+   ```
+
+2. Fazer login:
+   ```http
+   POST /api/auth/login
+   ```
+   Body:
+   ```json
+   {
+     "email": "ana@email.com",
+     "senha": "123456"
+   }
+   ```
+
+3. Copiar o token retornado e usar no header:
+   ```http
+   Authorization: Bearer <token>
+   ```
+
+4. Criar um livro:
+   ```http
+   POST /api/livros
+   ```
+
+5. Criar um empréstimo:
+   ```http
+   POST /api/emprestimos
+   ```
+
+### Testes automáticos
+Execute:
+
+```bash
+npm test
+```
+
+Os testes cobrem cenários de login JWT e validação/paginação de listagens.
+
+## 🔐 Autenticação
+
+### Login
+
+Rota:
+```http
+POST /api/auth/login
+```
+
+Body:
+```json
+{
+  "email": "bibliotecario@email.com",
+  "senha": "123456"
+}
+```
+
+Resposta:
+```json
+{
+  "mensagem": "Login realizado com sucesso",
+  "token": "...",
+  "usuario": {
+    "id": "...",
+    "nome": "...",
+    "email": "...",
+    "role": "bibliotecario"
+  }
+}
+```
+
+Use o token no header:
+```http
+Authorization: Bearer <token>
+```
+
+## 📌 Rotas principais
+
+### Autenticação
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/api/livros` | Cadastra um novo livro |
-| GET | `/api/livros` | Lista livros (filtros opcionais: `?titulo=`, `?autor=`, `?categoria=`, `?disponivel=true`) |
-| GET | `/api/livros/:id` | Busca um livro pelo ID |
-| PUT | `/api/livros/:id` | Atualiza dados de um livro |
-| DELETE | `/api/livros/:id` | Remove um livro |
+| POST | `/api/auth/login` | Faz login e retorna JWT |
 
-### Usuários — `/api/usuarios`
+### Livros
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/api/usuarios` | Cadastra um novo usuário |
-| GET | `/api/usuarios` | Lista usuários (filtros: `?nome=`, `?email=`) |
-| GET | `/api/usuarios/:id` | Busca um usuário pelo ID |
-| PUT | `/api/usuarios/:id` | Atualiza dados de um usuário |
+| POST | `/api/livros` | Cadastra um livro (apenas bibliotecário) |
+| GET | `/api/livros` | Lista livros com paginação e filtros |
+| GET | `/api/livros/:id` | Busca um livro |
+| PUT | `/api/livros/:id` | Atualiza um livro (apenas bibliotecário) |
+| DELETE | `/api/livros/:id` | Remove um livro (apenas bibliotecário) |
+
+### Usuários
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/api/usuarios` | Cadastra um usuário |
+| GET | `/api/usuarios` | Lista usuários com paginação |
+| GET | `/api/usuarios/:id` | Busca um usuário |
+| PUT | `/api/usuarios/:id` | Atualiza um usuário |
 | DELETE | `/api/usuarios/:id` | Remove um usuário |
 
-### Empréstimos — `/api/emprestimos`
+### Empréstimos
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/api/emprestimos` | Registra um empréstimo (body: `livroId`, `usuarioId`, `diasParaDevolucao` opcional) |
-| GET | `/api/emprestimos` | Lista empréstimos (filtros: `?status=`, `?usuarioId=`, `?livroId=`) |
-| GET | `/api/emprestimos/atrasados` | Lista empréstimos com devolução atrasada |
-| GET | `/api/emprestimos/:id` | Busca um empréstimo pelo ID |
-| PUT | `/api/emprestimos/:id/devolver` | Registra a devolução do livro |
+| POST | `/api/emprestimos` | Registra um empréstimo |
+| GET | `/api/emprestimos` | Lista empréstimos |
+| GET | `/api/emprestimos/atrasados` | Lista empréstimos atrasados |
+| GET | `/api/emprestimos/:id` | Busca um empréstimo |
+| PUT | `/api/emprestimos/:id/devolver` | Registra a devolução |
 
-## 🧠 Regras de negócio implementadas
+## 🔎 Exemplos de consulta
 
-- Um livro só pode ser emprestado se `quantidadeDisponivel > 0`.
-- Ao emprestar, `quantidadeDisponivel` do livro é decrementada em 1.
-- Ao devolver, `quantidadeDisponivel` é incrementada em 1 e o status do empréstimo vira `devolvido`.
-- Prazo padrão de devolução: 7 dias (pode ser customizado enviando `diasParaDevolucao` no corpo da requisição).
-- A rota `/api/emprestimos/atrasados` atualiza automaticamente o status para `atrasado` quando a data prevista já passou e o livro não foi devolvido.
-- ISBN de livro e e-mail de usuário são únicos no banco (retornam erro 409 se duplicados).
+### Listar livros com paginação
+```http
+GET /api/livros?page=1&limit=5
+```
 
-## 🛠️ Tecnologias usadas
+### Filtrar livros disponíveis
+```http
+GET /api/livros?disponivel=true
+```
+
+### Buscar usuários por nome
+```http
+GET /api/usuarios?nome=ana
+```
+
+## 🧠 Regras de negócio
+
+- Um livro só pode ser emprestado se houver exemplares disponíveis
+- Ao emprestar, a quantidade disponível é reduzida
+- Ao devolver, a quantidade disponível volta a subir
+- O prazo padrão de devolução é de 7 dias
+- O status do empréstimo pode ser `emprestado`, `devolvido` ou `atrasado`
+- ISBN do livro e e-mail do usuário são únicos
+
+## ☁️ Deploy no Render
+
+A aplicação já conta com o arquivo `render.yaml` para deploy no Render.
+
+Variáveis de ambiente recomendadas:
+```env
+PORT=3000
+NODE_ENV=production
+MONGO_URI=sua_uri_do_mongodb_atlas
+JWT_SECRET=sua_chave_secreta
+```
+
+## 🛠️ Tecnologias utilizadas
 
 - Node.js
 - Express
-- Mongoose (MongoDB)
-- dotenv
-- cors
-- morgan (logs das requisições)
+- MongoDB + Mongoose
+- JWT
+- Joi
+- Jest + Supertest
+- CORS + Morgan
 
-## ✅ Próximos passos sugeridos (melhorias futuras)
+## ✅ Conclusão
 
-- Autenticação com JWT (login de bibliotecário/usuário)
-- Paginação nas listagens
-- Validação de dados com uma lib como `joi` ou `zod`
-- Testes automatizados com `jest` + `supertest`
-- Deploy (Render, Railway) + MongoDB Atlas
+Este projeto demonstra a implementação de uma API REST funcional, com foco em organização de dados, controle de empréstimos, autenticação segura e testes automatizados, sendo adequado para uso acadêmico e para apresentação em trabalho de curso.
+

@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const livroRoutes = require("./routes/livroRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const emprestimoRoutes = require("./routes/emprestimoRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use("/api/auth", authRoutes);
 app.use("/api/livros", livroRoutes);
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/emprestimos", emprestimoRoutes);
