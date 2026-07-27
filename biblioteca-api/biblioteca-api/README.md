@@ -102,7 +102,6 @@ biblioteca-api/
 ## 🧪 Como podem testar
 
 ### Opção 1: teste local
-Cada integrante pode seguir estes passos:
 
 1. Clonar o projeto:
    ```bash
@@ -289,7 +288,18 @@ MONGO_URI=sua_uri_do_mongodb_atlas
 JWT_SECRET=sua_chave_secreta
 ```
 
-## 🛠️ Tecnologias utilizadas
+## � Possíveis implementações futuras
+
+Apesar da API já estar funcional, de acordo com a IA, algumas frescuras adicionais podem ser implementados para ampliar sua utilidade!!:
+
+- Recuperação de senha por e-mail
+- Sistema de reservas de livros indisponíveis
+- Notificações automáticas para empréstimos atrasados
+- Painel administrativo com estatísticas e relatórios
+- Upload de capa de livros e imagens de usuários
+- Histórico completo de movimentações da biblioteca
+
+## �🛠️ Tecnologias utilizadas
 
 - Node.js
 - Express
