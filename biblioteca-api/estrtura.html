@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca Online</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Sistema de Biblioteca</h1>
+    <div id="status-usuario">
+      Status da Conta: <span id="user-status-badge" class="ativo">Ativo</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="secao-alerta" class="card hidden">
+      <h2> Atenção!</h2>
+      <p id="mensagem-alerta"></p>
+    </section>
+
+
+    <section class="card">
+      <h2>Livros Disponíveis</h2>
+      <div id="lista-livros" class="grid-livros">
+        </div>
+    </section>
+
+    <section class="card">
+      <h2>Meus Empréstimos</h2>
+      <ul id="meus-emprestimos" class="lista-emprestimos">
+        </ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
