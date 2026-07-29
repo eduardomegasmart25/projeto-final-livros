@@ -1,33 +1,70 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Biblioteca Online</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>📚 Sistema de Biblioteca</h1>
-    <div id="status-usuario" class="status-usuario hidden">
-      Status da Conta: <span id="user-status-badge" class="ativo">Ativo</span>
-      <button id="btn-logout" class="btn-logout">Sair</button>
+    <div>
+      <h1>📚 Biblioteca Online</h1>
+      <p id="user-greeting" class="hidden"></p>
+    </div>
+    <div class="status-actions">
+      <span id="user-status-badge" class="status-badge ativo hidden">Ativo</span>
+      <button id="btn-logout" class="btn-logout hidden">Sair</button>
     </div>
   </header>
 
   <main class="container">
-    <section id="login-card" class="card">
-      <h2>Login</h2>
-      <div class="form-group">
-        <label for="login-email">E-mail</label>
-        <input id="login-email" type="email" placeholder="seu@email.com" />
+    <section id="auth-card" class="card auth-card">
+      <div class="tabs">
+        <button id="tab-login" class="tab active">Entrar</button>
+        <button id="tab-register" class="tab">Cadastrar</button>
       </div>
-      <div class="form-group">
-        <label for="login-senha">Senha</label>
-        <input id="login-senha" type="password" placeholder="Senha" />
+
+      <div id="login-form" class="form-panel">
+        <h2>Login</h2>
+        <div class="form-group">
+          <label for="login-email">E-mail</label>
+          <input id="login-email" type="email" placeholder="seu@email.com" />
+        </div>
+        <div class="form-group">
+          <label for="login-senha">Senha</label>
+          <input id="login-senha" type="password" placeholder="Senha" />
+        </div>
+        <button id="btn-login" class="btn-primary">Entrar</button>
+        <p id="login-error" class="error-message"></p>
       </div>
-      <button id="btn-login">Entrar</button>
-      <p id="login-error" class="error-message"></p>
+
+      <div id="register-form" class="form-panel hidden">
+        <h2>Cadastrar Usuário</h2>
+        <div class="form-group">
+          <label for="register-nome">Nome</label>
+          <input id="register-nome" type="text" placeholder="Seu nome" />
+        </div>
+        <div class="form-group">
+          <label for="register-email">E-mail</label>
+          <input id="register-email" type="email" placeholder="seu@email.com" />
+        </div>
+        <div class="form-group">
+          <label for="register-senha">Senha</label>
+          <input id="register-senha" type="password" placeholder="Senha" />
+        </div>
+        <div class="form-group">
+          <label for="register-telefone">Telefone</label>
+          <input id="register-telefone" type="text" placeholder="(00) 00000-0000" />
+        </div>
+        <div class="form-group">
+          <label for="register-matricula">Matrícula</label>
+          <input id="register-matricula" type="text" placeholder="Matrícula" />
+        </div>
+        <button id="btn-register" class="btn-secondary">Cadastrar</button>
+        <p id="register-error" class="error-message"></p>
+        <p id="register-success" class="success-message"></p>
+      </div>
     </section>
 
     <section id="app-container" class="container hidden">
@@ -36,14 +73,84 @@
         <p id="mensagem-alerta"></p>
       </section>
 
+      <section class="card painel-filtro">
+        <div class="filtro-row">
+          <div class="form-group">
+            <label for="search-titulo">Buscar título</label>
+            <input id="search-titulo" type="text" placeholder="Título do livro" />
+          </div>
+          <div class="form-group">
+            <label for="search-autor">Buscar autor</label>
+            <input id="search-autor" type="text" placeholder="Autor" />
+          </div>
+          <div class="form-group">
+            <label for="search-categoria">Buscar categoria</label>
+            <input id="search-categoria" type="text" placeholder="Categoria" />
+          </div>
+          <div class="form-group checkbox-group">
+            <input id="search-disponivel" type="checkbox" />
+            <label for="search-disponivel">Somente disponíveis</label>
+          </div>
+          <button id="btn-search" class="btn-primary">Filtrar</button>
+        </div>
+      </section>
+
       <section class="card">
-        <h2>Livros Disponíveis</h2>
+        <div class="section-header">
+          <h2>Livros Disponíveis</h2>
+          <div class="pagination-controls">
+            <button id="prev-page" class="btn-secondary">Anterior</button>
+            <span>Página <strong id="current-page">1</strong> de <strong id="total-pages">1</strong></span>
+            <button id="next-page" class="btn-secondary">Próxima</button>
+          </div>
+        </div>
         <div id="lista-livros" class="grid-livros"></div>
       </section>
 
       <section class="card">
         <h2>Meus Empréstimos</h2>
         <ul id="meus-emprestimos" class="lista-emprestimos"></ul>
+      </section>
+
+      <section id="admin-panel" class="card hidden">
+        <h2>Painel de Administração</h2>
+        <div class="admin-grid">
+          <div class="admin-card">
+            <h3>Cadastrar novo livro</h3>
+            <div class="form-group">
+              <label for="book-titulo">Título</label>
+              <input id="book-titulo" type="text" placeholder="Título do livro" />
+            </div>
+            <div class="form-group">
+              <label for="book-autor">Autor</label>
+              <input id="book-autor" type="text" placeholder="Autor" />
+            </div>
+            <div class="form-group">
+              <label for="book-isbn">ISBN</label>
+              <input id="book-isbn" type="text" placeholder="ISBN" />
+            </div>
+            <div class="form-group">
+              <label for="book-categoria">Categoria</label>
+              <input id="book-categoria" type="text" placeholder="Categoria" />
+            </div>
+            <div class="form-group">
+              <label for="book-ano">Ano de publicação</label>
+              <input id="book-ano" type="number" placeholder="2025" />
+            </div>
+            <div class="form-group">
+              <label for="book-quantidade">Quantidade total</label>
+              <input id="book-quantidade" type="number" placeholder="1" min="1" />
+            </div>
+            <button id="btn-add-book" class="btn-primary">Adicionar Livro</button>
+            <p id="book-error" class="error-message"></p>
+            <p id="book-success" class="success-message"></p>
+          </div>
+
+          <div class="admin-card admin-list-card">
+            <h3>Gerenciar livros</h3>
+            <div id="admin-livros"></div>
+          </div>
+        </div>
       </section>
     </section>
   </main>

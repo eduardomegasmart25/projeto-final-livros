@@ -5,9 +5,13 @@ let mongoServer;
 
 async function conectarBanco() {
   const uri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/biblioteca";
+  const connectOptions = {
+    serverSelectionTimeoutMS: 5000,
+    connectTimeoutMS: 10000,
+  };
 
   try {
-    await mongoose.connect(uri);
+    await mongoose.connect(uri, connectOptions);
     console.log("MongoDB conectado com sucesso!");
     return;
   } catch (erro) {
@@ -20,15 +24,9 @@ async function conectarBanco() {
   }
 
   try {
-    const cacheDir = path.resolve(__dirname, "../../tmp/mongo-memory-db");
-    if (!fs.existsSync(cacheDir)) {
-      fs.mkdirSync(cacheDir, { recursive: true });
-    }
-
     const { MongoMemoryServer } = require("mongodb-memory-server");
     mongoServer = await MongoMemoryServer.create({
       instance: {
-        dbPath: cacheDir,
         args: ["--nounixsocket"],
       },
       binary: {
