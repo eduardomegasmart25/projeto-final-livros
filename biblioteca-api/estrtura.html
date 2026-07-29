@@ -7,31 +7,44 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <header>
-    <h1>Sistema de Biblioteca</h1>
-    <div id="status-usuario">
+    <h1>📚 Sistema de Biblioteca</h1>
+    <div id="status-usuario" class="status-usuario hidden">
       Status da Conta: <span id="user-status-badge" class="ativo">Ativo</span>
+      <button id="btn-logout" class="btn-logout">Sair</button>
     </div>
   </header>
 
   <main class="container">
-    <section id="secao-alerta" class="card hidden">
-      <h2> Atenção!</h2>
-      <p id="mensagem-alerta"></p>
+    <section id="login-card" class="card">
+      <h2>Login</h2>
+      <div class="form-group">
+        <label for="login-email">E-mail</label>
+        <input id="login-email" type="email" placeholder="seu@email.com" />
+      </div>
+      <div class="form-group">
+        <label for="login-senha">Senha</label>
+        <input id="login-senha" type="password" placeholder="Senha" />
+      </div>
+      <button id="btn-login">Entrar</button>
+      <p id="login-error" class="error-message"></p>
     </section>
 
+    <section id="app-container" class="container hidden">
+      <section id="secao-alerta" class="card hidden">
+        <h2>⚠️ Atenção!</h2>
+        <p id="mensagem-alerta"></p>
+      </section>
 
-    <section class="card">
-      <h2>Livros Disponíveis</h2>
-      <div id="lista-livros" class="grid-livros">
-        </div>
-    </section>
+      <section class="card">
+        <h2>Livros Disponíveis</h2>
+        <div id="lista-livros" class="grid-livros"></div>
+      </section>
 
-    <section class="card">
-      <h2>Meus Empréstimos</h2>
-      <ul id="meus-emprestimos" class="lista-emprestimos">
-        </ul>
+      <section class="card">
+        <h2>Meus Empréstimos</h2>
+        <ul id="meus-emprestimos" class="lista-emprestimos"></ul>
+      </section>
     </section>
   </main>
 

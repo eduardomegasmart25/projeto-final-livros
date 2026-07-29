@@ -39,6 +39,34 @@ header {
   display: none;
 }
 
+.status-usuario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.error-message {
+  color: #e74c3c;
+  margin-top: 10px;
+}
+
 /* Status do Usuário */
 .ativo { color: #2ecc71; font-weight: bold; }
 .bloqueado { color: #e74c3c; font-weight: bold; }
@@ -77,7 +105,10 @@ button.btn-devolver {
   background: #e67e22;
 }
 
-/* Lista de Empréstimos */
+button#btn-logout {
+  background: #e74c3c;
+}
+
 .lista-emprestimos {
   list-style: none;
   margin-top: 10px;

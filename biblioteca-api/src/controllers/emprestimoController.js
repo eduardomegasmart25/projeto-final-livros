@@ -7,10 +7,16 @@ const DIAS_PADRAO_DEVOLUCAO = 7;
 // Criar um empréstimo (retirar um livro)
 async function criarEmprestimo(req, res) {
   try {
-    const { livroId, usuarioId, diasParaDevolucao } = req.body;
+    const { livroId, usuarioId: usuarioIdBody, diasParaDevolucao } = req.body;
+    const usuarioIdToken = req.usuario.id || req.usuario._id;
+    const usuarioId = usuarioIdBody || usuarioIdToken;
 
     if (!livroId || !usuarioId) {
       return res.status(400).json({ erro: "livroId e usuarioId são obrigatórios" });
+    }
+
+    if (usuarioIdBody && usuarioIdBody !== usuarioIdToken && req.usuario.role !== "bibliotecario") {
+      return res.status(403).json({ erro: "Somente bibliotecários podem criar empréstimos para outros usuários" });
     }
 
     const livro = await Livro.findById(livroId);
@@ -56,6 +62,10 @@ async function devolverEmprestimo(req, res) {
       return res.status(404).json({ erro: "Empréstimo não encontrado" });
     }
 
+    if (req.usuario.role !== "bibliotecario" && emprestimo.usuario.toString() !== (req.usuario.id || req.usuario._id)) {
+      return res.status(403).json({ erro: "Acesso negado para este empréstimo" });
+    }
+
     if (emprestimo.status === "devolvido") {
       return res.status(400).json({ erro: "Este empréstimo já foi devolvido" });
     }
@@ -83,8 +93,13 @@ async function listarEmprestimos(req, res) {
     const { status, usuarioId, livroId } = req.query;
     const filtro = {};
     if (status) filtro.status = status;
-    if (usuarioId) filtro.usuario = usuarioId;
     if (livroId) filtro.livro = livroId;
+
+    if (req.usuario.role !== "bibliotecario") {
+      filtro.usuario = req.usuario.id || req.usuario._id;
+    } else if (usuarioId) {
+      filtro.usuario = usuarioId;
+    }
 
     const emprestimos = await Emprestimo.find(filtro)
       .populate("livro")
@@ -107,6 +122,11 @@ async function buscarEmprestimoPorId(req, res) {
     if (!emprestimo) {
       return res.status(404).json({ erro: "Empréstimo não encontrado" });
     }
+
+    if (req.usuario.role !== "bibliotecario" && emprestimo.usuario._id.toString() !== (req.usuario.id || req.usuario._id)) {
+      return res.status(403).json({ erro: "Acesso negado para este empréstimo" });
+    }
+
     return res.status(200).json(emprestimo);
   } catch (erro) {
     return res.status(400).json({ erro: "ID inválido" });

@@ -8,14 +8,14 @@ const {
   listarEmprestimosAtrasados,
 } = require("../controllers/emprestimoController");
 const autenticarToken = require("../middlewares/authMiddleware");
-const autorizarRoles = require("../middlewares/roleMiddleware");
+const { autorizarRoles } = require("../middlewares/roleMiddleware");
 
 // IMPORTANTE: a rota /atrasados precisa vir ANTES de /:id
 router.get("/atrasados", autenticarToken, autorizarRoles("bibliotecario"), listarEmprestimosAtrasados);
 
-router.post("/", autenticarToken, autorizarRoles("bibliotecario"), criarEmprestimo);
-router.get("/", autenticarToken, autorizarRoles("bibliotecario"), listarEmprestimos);
-router.get("/:id", autenticarToken, autorizarRoles("bibliotecario"), buscarEmprestimoPorId);
-router.put("/:id/devolver", autenticarToken, autorizarRoles("bibliotecario"), devolverEmprestimo);
+router.post("/", autenticarToken, autorizarRoles("usuario", "bibliotecario"), criarEmprestimo);
+router.get("/", autenticarToken, autorizarRoles("usuario", "bibliotecario"), listarEmprestimos);
+router.get("/:id", autenticarToken, autorizarRoles("usuario", "bibliotecario"), buscarEmprestimoPorId);
+router.put("/:id/devolver", autenticarToken, autorizarRoles("usuario", "bibliotecario"), devolverEmprestimo);
 
 module.exports = router;
