@@ -3,21 +3,28 @@ const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 
 const app = require("../src/app");
-const conectarBanco = require("../src/config/db");
+const { conectarBanco } = require("../src/config/db");
 const Usuario = require("../src/models/Usuario");
 const Livro = require("../src/models/Livro");
 
 let mongoServer;
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  process.env.MONGO_URI = mongoServer.getUri();
+  try {
+    mongoServer = await MongoMemoryServer.create();
+    process.env.MONGO_URI = mongoServer.getUri();
+  } catch (erro) {
+    console.warn("MongoMemoryServer falhou, tentando MongoDB local:", erro.message);
+  }
+
   await conectarBanco();
 });
 
 afterAll(async () => {
   await mongoose.disconnect();
-  await mongoServer.stop();
+  if (mongoServer && typeof mongoServer.stop === "function") {
+    await mongoServer.stop();
+  }
 });
 
 beforeEach(async () => {

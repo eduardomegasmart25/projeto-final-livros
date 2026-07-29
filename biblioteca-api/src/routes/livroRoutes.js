@@ -8,7 +8,7 @@ const {
   excluirLivro,
 } = require("../controllers/livroController");
 const autenticarToken = require("../middlewares/authMiddleware");
-const autorizarRoles = require("../middlewares/roleMiddleware");
+const { autorizarRoles } = require("../middlewares/roleMiddleware");
 
 router.get("/", listarLivros);
 router.get("/:id", buscarLivroPorId);
