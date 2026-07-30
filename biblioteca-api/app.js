@@ -1,7 +1,8 @@
 // A API é acessada automaticamente a partir da origem atual.
-// Se estiver hospedado junto com o backend, o frontend usará o mesmo domínio.
+// Se o frontend estiver hospedado juntamente com o backend, usará o mesmo domínio.
+// Caso contrário, usa a URL remota padrão do backend.
 const DEFAULT_API_BASE_URL = 'https://biblioteca-minhaapp.onrender.com/api';
-const API_BASE_URL = window.location.protocol.startsWith('http')
+const API_BASE_URL = window.location.origin && window.location.origin !== 'null'
   ? `${window.location.origin}/api`
   : DEFAULT_API_BASE_URL;
 let authToken = localStorage.getItem('bibliotecaToken');
