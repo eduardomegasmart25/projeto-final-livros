@@ -1,6 +1,7 @@
 const Emprestimo = require("../models/Emprestimo");
 const Livro = require("../models/Livro");
 const Usuario = require("../models/Usuario");
+const { registrarMovimentacao } = require("../utils/historico");
 
 const DIAS_PADRAO_DEVOLUCAO = 7;
 
@@ -53,6 +54,15 @@ async function criarEmprestimo(req, res) {
     livro.quantidadeDisponivel -= 1;
     await livro.save();
 
+    await registrarMovimentacao({
+      usuarioId: req.usuario?.id || req.usuario?._id,
+      action: "emprestar",
+      resourceType: "emprestimo",
+      resourceId: emprestimo._id.toString(),
+      descricao: `Empréstimo criado para ${usuario.nome}: ${livro.titulo}`,
+      detalhes: { livroId: livro._id.toString(), usuarioId: usuario._id.toString(), preco, dataDevolucaoPrevista },
+    });
+
     const emprestimoPopulado = await emprestimo.populate(["livro", "usuario"]);
 
     return res.status(201).json(emprestimoPopulado);
@@ -86,6 +96,15 @@ async function devolverEmprestimo(req, res) {
       livro.quantidadeDisponivel += 1;
       await livro.save();
     }
+
+    await registrarMovimentacao({
+      usuarioId: req.usuario?.id || req.usuario?._id,
+      action: "devolver",
+      resourceType: "emprestimo",
+      resourceId: emprestimo._id.toString(),
+      descricao: `Devolução registrada: ${emprestimo._id}`,
+      detalhes: { livroId: emprestimo.livro.toString(), usuarioId: emprestimo.usuario.toString(), dataDevolucaoReal: emprestimo.dataDevolucaoReal },
+    });
 
     const emprestimoPopulado = await emprestimo.populate(["livro", "usuario"]);
     return res.status(200).json(emprestimoPopulado);

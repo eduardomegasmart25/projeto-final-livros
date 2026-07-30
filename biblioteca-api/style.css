@@ -363,7 +363,7 @@ input[type='number']:focus {
 .lista-emprestimos li {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 20px;
   border: 1px solid #e5e7eb;
   border-radius: 20px;
@@ -379,6 +379,43 @@ input[type='number']:focus {
   font-weight: 700;
   color: #6b4226;
   margin-top: 6px;
+}
+
+.loan-group {
+  border: 1px solid #d7c0a7;
+  border-radius: 22px;
+  padding: 18px;
+  background: #fff7ed;
+  margin-bottom: 18px;
+}
+
+.loan-group-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.loan-group-header strong {
+  font-size: 1.05rem;
+}
+
+.loan-group-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.loan-group-count {
+  background: #8e5d24;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.9rem;
 }
 
 .admin-grid {
@@ -427,6 +464,60 @@ input[type='number']:focus {
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
+}
+
+.admin-stats-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  margin-bottom: 18px;
+}
+
+.stat-card {
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-card strong {
+  color: #475569;
+}
+
+.stat-card span {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.admin-history {
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+}
+
+.admin-history ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.admin-history li {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  background: #f8fafc;
+}
+
+.history-details {
+  margin-top: 8px;
+  color: #334155;
+  font-size: 0.92rem;
 }
 
 .pagination-controls {

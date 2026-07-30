@@ -102,6 +102,9 @@
               <label for="search-categoria">Buscar categoria</label>
               <input id="search-categoria" type="text" placeholder="Categoria" />
             </div>
+            <div class="form-group checkbox-group">
+              <label><input id="search-disponivel" type="checkbox" /> Apenas disponíveis</label>
+            </div>
         <div class="form-group">
           <label for="loan-days">Dias de empréstimo</label>
           <input id="loan-days" type="number" min="1" value="7" />
@@ -130,7 +133,7 @@
       <section id="loans-page" class="view-page hidden">
         <section class="card">
           <div class="section-header">
-            <h2>Meus Empréstimos</h2>
+            <h2 id="loans-title">Meus Empréstimos</h2>
           </div>
           <ul id="meus-emprestimos" class="lista-emprestimos"></ul>
         </section>
@@ -167,11 +170,37 @@
             <button id="btn-add-book" class="btn-primary">Adicionar Livro</button>
             <p id="book-error" class="error-message"></p>
             <p id="book-success" class="success-message"></p>
+
+            <div class="admin-upload-card">
+              <h4>Enviar capa de livro</h4>
+              <div class="form-group">
+                <label for="cover-book-select">Livro</label>
+                <select id="cover-book-select"></select>
+              </div>
+              <div class="form-group">
+                <label for="cover-file">Arquivo de capa</label>
+                <input id="cover-file" type="file" accept="image/*" />
+              </div>
+              <button id="btn-upload-cover" class="btn-secondary">Enviar Capa</button>
+              <p id="cover-error" class="error-message"></p>
+              <p id="cover-success" class="success-message"></p>
+            </div>
           </div>
 
           <div class="admin-card admin-list-card">
             <h3>Gerenciar livros</h3>
             <div id="admin-livros"></div>
+          </div>
+        </section>
+        <section class="card admin-summary-card">
+          <h3>Resumo administrativo</h3>
+          <div id="admin-stats" class="admin-stats-grid"></div>
+          <div class="admin-history">
+            <div class="section-header">
+              <h4>Últimas movimentações</h4>
+              <button id="btn-refresh-history" class="btn-secondary">Atualizar</button>
+            </div>
+            <ul id="admin-history-list" class="lista-emprestimos"></ul>
           </div>
         </section>
       </section>

@@ -7,6 +7,8 @@ const livroRoutes = require("./routes/livroRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const emprestimoRoutes = require("./routes/emprestimoRoutes");
 const authRoutes = require("./routes/authRoutes");
+const historicoRoutes = require("./routes/historicoRoutes");
+const relatorioRoutes = require("./routes/relatorioRoutes");
 
 const app = express();
 app.use(cors({
@@ -17,6 +19,7 @@ app.use(cors({
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "..")));
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "estrtura.html"));
@@ -29,6 +32,8 @@ app.get("/api", (req, res) => {
       livros: "/api/livros",
       usuarios: "/api/usuarios",
       emprestimos: "/api/emprestimos",
+      historico: "/api/historico/movimentacoes",
+      relatorios: "/api/relatorios/estatisticas",
     },
   });
 });
@@ -37,6 +42,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/livros", livroRoutes);
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/emprestimos", emprestimoRoutes);
+app.use("/api/historico", historicoRoutes);
+app.use("/api/relatorios", relatorioRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ erro: "Rota não encontrada" });

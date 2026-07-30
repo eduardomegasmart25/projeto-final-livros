@@ -26,6 +26,11 @@ const usuarioSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    avatarUrl: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     ativo: {
       type: Boolean,
       default: true,

@@ -23,6 +23,11 @@ const livroSchema = new mongoose.Schema(
       trim: true,
       default: "Geral",
     },
+    capaUrl: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     anoPublicacao: {
       type: Number,
     },

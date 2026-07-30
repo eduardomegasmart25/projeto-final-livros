@@ -295,30 +295,82 @@ async function carregarEmprestimos() {
 
     const emprestimos = await response.json();
     const lista = document.getElementById('meus-emprestimos');
+    const loansTitle = document.getElementById('loans-title');
     lista.innerHTML = '';
 
     if (!Array.isArray(emprestimos) || emprestimos.length === 0) {
       lista.innerHTML = '<li>Nenhum empréstimo encontrado.</li>';
+      loansTitle.textContent = usuarioLogado.role === 'bibliotecario' ? 'Empréstimos dos Clientes' : 'Meus Empréstimos';
       return;
     }
 
-    emprestimos.forEach((emp) => {
-      const item = document.createElement('li');
-      const dataEntrega = new Date(emp.dataDevolucaoPrevista).toLocaleDateString('pt-BR');
-      const tituloLivro = emp.livro?.titulo || 'Livro não disponível';
-      const status = emp.status || 'emprestado';
-      const preco = typeof emp.preco === 'number' ? emp.preco : parseFloat(emp.preco) || 0;
-      item.innerHTML = `
-        <div>
-          <strong>${tituloLivro}</strong>
-          <p>Devolução até: ${dataEntrega}</p>
-          <p>Status: ${status}</p>
-          <p class="loan-price">Preço: R$ ${preco.toFixed(2).replace('.', ',')}</p>
-        </div>
-        <button class="btn-secondary" onclick="devolverLivro('${emp._id}')">Devolver</button>
-      `;
-      lista.appendChild(item);
-    });
+    if (usuarioLogado.role === 'bibliotecario') {
+      loansTitle.textContent = 'Empréstimos dos Clientes';
+      const grupos = emprestimos.reduce((acc, emp) => {
+        const usuarioId = emp.usuario?._id || 'sem-usuario';
+        if (!acc[usuarioId]) {
+          acc[usuarioId] = {
+            usuario: emp.usuario || { nome: 'Cliente desconhecido', email: '' },
+            emprestimos: [],
+          };
+        }
+        acc[usuarioId].emprestimos.push(emp);
+        return acc;
+      }, {});
+
+      Object.values(grupos).forEach((grupo) => {
+        const groupItem = document.createElement('li');
+        groupItem.className = 'loan-group';
+        groupItem.innerHTML = `
+          <div class="loan-group-header">
+            <strong>${grupo.usuario.nome}</strong>
+            <span>${grupo.usuario.email || ''}</span>
+            <span class="loan-group-count">${grupo.emprestimos.length} empréstimo(s)</span>
+          </div>
+          <ul class="loan-group-list">
+            ${grupo.emprestimos
+              .map((emp) => {
+                const dataEntrega = new Date(emp.dataDevolucaoPrevista).toLocaleDateString('pt-BR');
+                const tituloLivro = emp.livro?.titulo || 'Livro não disponível';
+                const status = emp.status || 'emprestado';
+                const preco = typeof emp.preco === 'number' ? emp.preco : parseFloat(emp.preco) || 0;
+                return `
+                  <li>
+                    <div>
+                      <strong>${tituloLivro}</strong>
+                      <p>Devolução até: ${dataEntrega}</p>
+                      <p>Status: ${status}</p>
+                      <p class="loan-price">Preço: R$ ${preco.toFixed(2).replace('.', ',')}</p>
+                    </div>
+                    <button class="btn-secondary" onclick="devolverLivro('${emp._id}')">Devolver</button>
+                  </li>
+                `;
+              })
+              .join('')}
+          </ul>
+        `;
+        lista.appendChild(groupItem);
+      });
+    } else {
+      loansTitle.textContent = 'Meus Empréstimos';
+      emprestimos.forEach((emp) => {
+        const item = document.createElement('li');
+        const dataEntrega = new Date(emp.dataDevolucaoPrevista).toLocaleDateString('pt-BR');
+        const tituloLivro = emp.livro?.titulo || 'Livro não disponível';
+        const status = emp.status || 'emprestado';
+        const preco = typeof emp.preco === 'number' ? emp.preco : parseFloat(emp.preco) || 0;
+        item.innerHTML = `
+          <div>
+            <strong>${tituloLivro}</strong>
+            <p>Devolução até: ${dataEntrega}</p>
+            <p>Status: ${status}</p>
+            <p class="loan-price">Preço: R$ ${preco.toFixed(2).replace('.', ',')}</p>
+          </div>
+          <button class="btn-secondary" onclick="devolverLivro('${emp._id}')">Devolver</button>
+        `;
+        lista.appendChild(item);
+      });
+    }
   } catch (erro) {
     console.error(erro);
   }
@@ -466,6 +518,74 @@ async function carregarAdminLivros() {
   }
 }
 
+async function carregarEstatisticas() {
+  if (!usuarioLogado || usuarioLogado.role !== 'bibliotecario') return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/relatorios/estatisticas`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Falha ao carregar estatísticas.');
+    }
+
+    const data = await response.json();
+    const statsContainer = document.getElementById('admin-stats');
+    statsContainer.innerHTML = `
+      <div class="stat-card"><strong>Usuários</strong><span>${data.totalUsuarios}</span></div>
+      <div class="stat-card"><strong>Livros</strong><span>${data.totalLivros}</span></div>
+      <div class="stat-card"><strong>Empréstimos</strong><span>${data.totalEmprestimos}</span></div>
+      <div class="stat-card"><strong>Ativos</strong><span>${data.emprestimosAtivos}</span></div>
+      <div class="stat-card"><strong>Atrasados</strong><span>${data.emprestimosAtrasados}</span></div>
+      <div class="stat-card"><strong>Receita</strong><span>R$ ${data.totalReceita.toFixed(2).replace('.', ',')}</span></div>
+    `;
+  } catch (erro) {
+    console.error(erro);
+  }
+}
+
+async function carregarHistorico() {
+  if (!usuarioLogado || usuarioLogado.role !== 'bibliotecario') return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/historico/movimentacoes?limit=10`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Falha ao carregar histórico.');
+    }
+
+    const data = await response.json();
+    const historyList = document.getElementById('admin-history-list');
+    historyList.innerHTML = '';
+
+    if (!Array.isArray(data.items) || data.items.length === 0) {
+      historyList.innerHTML = '<li>Nenhuma movimentação registrada.</li>';
+      return;
+    }
+
+    data.items.forEach((item) => {
+      const li = document.createElement('li');
+      const createdAt = new Date(item.createdAt).toLocaleString('pt-BR');
+      const usuarioNome = item.usuario?.nome || 'Sistema';
+      const detalhes = item.detalhes ? JSON.stringify(item.detalhes) : '';
+      li.innerHTML = `
+        <div>
+          <strong>${item.action.toUpperCase()}</strong> — ${item.resourceType}
+          <p>${item.descricao || 'Sem descrição'}</p>
+          <p><small>${usuarioNome} · ${createdAt}</small></p>
+          <p class="history-details">${detalhes}</p>
+        </div>
+      `;
+      historyList.appendChild(li);
+    });
+  } catch (erro) {
+    console.error(erro);
+  }
+}
+
 async function excluirLivro(livroId) {
   if (!confirm('Deseja realmente excluir este livro?')) return;
 
@@ -576,6 +696,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  document.getElementById('btn-upload-cover').addEventListener('click', uploadCapaLivro);
+  document.getElementById('btn-refresh-history').addEventListener('click', carregarHistorico);
+
   if (authToken && usuarioLogado) {
     updateUserHeader();
     mostrarApp();
@@ -584,8 +707,75 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarEmprestimos();
     if (usuarioLogado.role === 'bibliotecario') {
       carregarAdminLivros();
+      carregarLivrosParaUpload();
+      carregarEstatisticas();
+      carregarHistorico();
     }
   } else {
     mostrarLogin();
   }
 });
+
+async function carregarLivrosParaUpload() {
+  if (!usuarioLogado || usuarioLogado.role !== 'bibliotecario') return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/livros?page=1&limit=50`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao carregar livros para upload.');
+    }
+
+    const data = await response.json();
+    const select = document.getElementById('cover-book-select');
+    select.innerHTML = '<option value="">Selecione um livro</option>';
+    data.items.forEach((livro) => {
+      const option = document.createElement('option');
+      option.value = livro._id;
+      option.textContent = `${livro.titulo} — ${livro.autor}`;
+      select.appendChild(option);
+    });
+  } catch (erro) {
+    console.error(erro);
+  }
+}
+
+async function uploadCapaLivro() {
+  clearMessages();
+  const livroId = document.getElementById('cover-book-select').value;
+  const arquivo = document.getElementById('cover-file').files[0];
+
+  if (!livroId || !arquivo) {
+    showError('cover-error', 'Selecione um livro e um arquivo de capa.');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('capa', arquivo);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/livros/${livroId}/capa`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      showError('cover-error', err.erro || 'Erro ao enviar capa.');
+      return;
+    }
+
+    showSuccess('cover-success', 'Capa enviada com sucesso!');
+    document.getElementById('cover-file').value = '';
+    carregarLivrosParaUpload();
+    carregarLivros(currentPage);
+    carregarAdminLivros();
+  } catch (erro) {
+    console.error(erro);
+    showError('cover-error', 'Erro de conexão ao enviar capa.');
+  }
+}
+

@@ -1,9 +1,10 @@
 const Livro = require("../models/Livro");
+const { registrarMovimentacao } = require("../utils/historico");
 
 // Criar um novo livro
 async function criarLivro(req, res) {
   try {
-    const { titulo, autor, isbn, categoria, anoPublicacao, quantidadeTotal } = req.body;
+    const { titulo, autor, isbn, categoria, anoPublicacao, quantidadeTotal, capaUrl } = req.body;
 
     const quantidade = quantidadeTotal !== undefined ? quantidadeTotal : 1;
 
@@ -12,9 +13,19 @@ async function criarLivro(req, res) {
       autor,
       isbn,
       categoria,
+      capaUrl,
       anoPublicacao,
       quantidadeTotal: quantidade,
       quantidadeDisponivel: quantidade,
+    });
+
+    await registrarMovimentacao({
+      usuarioId: req.usuario?.id || req.usuario?._id,
+      action: "criar",
+      resourceType: "livro",
+      resourceId: livro._id.toString(),
+      descricao: `Livro criado: ${titulo}`,
+      detalhes: { isbn, categoria, capaUrl },
     });
 
     return res.status(201).json(livro);
@@ -98,9 +109,52 @@ async function excluirLivro(req, res) {
     if (!livro) {
       return res.status(404).json({ erro: "Livro não encontrado" });
     }
+
+    await registrarMovimentacao({
+      usuarioId: req.usuario?.id || req.usuario?._id,
+      action: "excluir",
+      resourceType: "livro",
+      resourceId: livro._id.toString(),
+      descricao: `Livro excluído: ${livro.titulo}`,
+      detalhes: { isbn: livro.isbn },
+    });
+
     return res.status(200).json({ mensagem: "Livro excluído com sucesso" });
   } catch (erro) {
     return res.status(400).json({ erro: "ID inválido" });
+  }
+}
+
+async function atualizarCapaLivro(req, res) {
+  try {
+    const arquivo = req.file;
+    if (!arquivo) {
+      return res.status(400).json({ erro: "Arquivo de capa não fornecido" });
+    }
+
+    const capaUrl = `/uploads/${arquivo.filename}`;
+    const livro = await Livro.findByIdAndUpdate(
+      req.params.id,
+      { capaUrl },
+      { new: true, runValidators: true }
+    );
+
+    if (!livro) {
+      return res.status(404).json({ erro: "Livro não encontrado" });
+    }
+
+    await registrarMovimentacao({
+      usuarioId: req.usuario?.id || req.usuario?._id,
+      action: "upload_capa",
+      resourceType: "livro",
+      resourceId: livro._id.toString(),
+      descricao: `Capa atualizada: ${livro.titulo}`,
+      detalhes: { capaUrl },
+    });
+
+    return res.status(200).json(livro);
+  } catch (erro) {
+    return res.status(400).json({ erro: erro.message });
   }
 }
 
@@ -109,5 +163,6 @@ module.exports = {
   listarLivros,
   buscarLivroPorId,
   atualizarLivro,
+  atualizarCapaLivro,
   excluirLivro,
 };
