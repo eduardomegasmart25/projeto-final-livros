@@ -10,8 +10,11 @@ A aplicação foi construída com Node.js, Express e MongoDB, seguindo boas prá
 
 - Cadastro, listagem, busca, atualização e remoção de livros
 - Cadastro, listagem, busca, atualização e remoção de usuários
+- Upload de capa de livro por arquivo ou URL
+- Upload de avatar de usuário
 - Registro de empréstimos e devoluções
 - Controle de disponibilidade de exemplares
+- Histórico de movimentações e relatórios administrativos
 - Autenticação com JWT para login de bibliotecário/usuário
 - Proteção de rotas sensíveis por perfil
 - Paginação nas listagens de livros e usuários
@@ -239,7 +242,18 @@ Authorization: Bearer <token>
 | GET | `/api/usuarios` | Lista usuários com paginação |
 | GET | `/api/usuarios/:id` | Busca um usuário |
 | PUT | `/api/usuarios/:id` | Atualiza um usuário |
+| PUT | `/api/usuarios/:id/avatar` | Atualiza avatar do usuário |
 | DELETE | `/api/usuarios/:id` | Remove um usuário |
+
+### Livros
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/api/livros` | Cadastra um livro (aceita `capaUrl`) |
+| GET | `/api/livros` | Lista livros com paginação e filtros |
+| GET | `/api/livros/:id` | Busca um livro |
+| PUT | `/api/livros/:id` | Atualiza um livro |
+| PUT | `/api/livros/:id/capa` | Envia arquivo de capa para um livro |
+| DELETE | `/api/livros/:id` | Remove um livro |
 
 ### Empréstimos
 | Método | Rota | Descrição |
@@ -249,6 +263,12 @@ Authorization: Bearer <token>
 | GET | `/api/emprestimos/atrasados` | Lista empréstimos atrasados |
 | GET | `/api/emprestimos/:id` | Busca um empréstimo |
 | PUT | `/api/emprestimos/:id/devolver` | Registra a devolução |
+
+### Administração
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/api/historico/movimentacoes` | Lista as movimentações administrativas |
+| GET | `/api/relatorios/estatisticas` | Retorna métricas e receita do sistema |
 
 ## 🔎 Exemplos de consulta
 
@@ -287,17 +307,6 @@ NODE_ENV=production
 MONGO_URI=sua_uri_do_mongodb_atlas
 JWT_SECRET=sua_chave_secreta
 ```
-
-## � Possíveis implementações futuras
-
-Apesar da API já estar funcional, de acordo com a IA, algumas frescuras adicionais podem ser implementados para ampliar sua utilidade!!:
-
-- Recuperação de senha por e-mail
-- Sistema de reservas de livros indisponíveis
-- Notificações automáticas para empréstimos atrasados
-- Painel administrativo com estatísticas e relatórios
-- Upload de capa de livros e imagens de usuários
-- Histórico completo de movimentações da biblioteca
 
 ## �🛠️ Tecnologias utilizadas
 

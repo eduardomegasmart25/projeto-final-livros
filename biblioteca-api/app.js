@@ -265,6 +265,7 @@ async function carregarLivros(page = 1) {
       card.innerHTML = `
         <h3>${livro.titulo}</h3>
         <p><strong>Autor:</strong> ${livro.autor}</p>
+        ${livro.capaUrl ? `<img class="livro-cover" src="${livro.capaUrl}" alt="Capa de ${livro.titulo}" />` : ''}
         <p><strong>Categoria:</strong> ${livro.categoria || '—'}</p>
         <p><strong>ISBN:</strong> ${livro.isbn || '—'}</p>
         <p><strong>Disponível:</strong> ${livro.quantidadeDisponivel} de ${livro.quantidadeTotal}</p>
@@ -437,6 +438,7 @@ async function adicionarLivro() {
   const autor = document.getElementById('book-autor').value.trim();
   const isbn = document.getElementById('book-isbn').value.trim();
   const categoria = document.getElementById('book-categoria').value.trim();
+  const capaUrl = document.getElementById('book-capa-url').value.trim();
   const anoPublicacao = parseInt(document.getElementById('book-ano').value, 10);
   const quantidadeTotal = parseInt(document.getElementById('book-quantidade').value, 10);
 
@@ -452,7 +454,7 @@ async function adicionarLivro() {
         'Content-Type': 'application/json',
         ...getAuthHeaders(),
       },
-      body: JSON.stringify({ titulo, autor, isbn, categoria, anoPublicacao, quantidadeTotal }),
+      body: JSON.stringify({ titulo, autor, isbn, categoria, capaUrl, anoPublicacao, quantidadeTotal }),
     });
 
     if (!response.ok) {
@@ -466,6 +468,7 @@ async function adicionarLivro() {
     document.getElementById('book-autor').value = '';
     document.getElementById('book-isbn').value = '';
     document.getElementById('book-categoria').value = '';
+    document.getElementById('book-capa-url').value = '';
     document.getElementById('book-ano').value = '';
     document.getElementById('book-quantidade').value = '';
     carregarLivros(currentPage);
