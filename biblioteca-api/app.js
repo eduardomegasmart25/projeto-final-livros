@@ -1,3 +1,8 @@
+// Substitua pela URL onde sua API está hospedada.
+// Exemplo Render:
+// const API_BASE_URL = 'https://sua-api.onrender.com/api';
+// Exemplo mesma rede local:
+// const API_BASE_URL = 'http://192.168.1.100:3000/api';
 const API_BASE_URL = 'http://localhost:3000/api';
 let authToken = localStorage.getItem('bibliotecaToken');
 let usuarioLogado = JSON.parse(localStorage.getItem('bibliotecaUsuario')) || null;
