@@ -307,11 +307,13 @@ async function carregarEmprestimos() {
       const dataEntrega = new Date(emp.dataDevolucaoPrevista).toLocaleDateString('pt-BR');
       const tituloLivro = emp.livro?.titulo || 'Livro não disponível';
       const status = emp.status || 'emprestado';
+      const preco = typeof emp.preco === 'number' ? emp.preco : parseFloat(emp.preco) || 0;
       item.innerHTML = `
         <div>
           <strong>${tituloLivro}</strong>
           <p>Devolução até: ${dataEntrega}</p>
           <p>Status: ${status}</p>
+          <p class="loan-price">Preço: R$ ${preco.toFixed(2).replace('.', ',')}</p>
         </div>
         <button class="btn-secondary" onclick="devolverLivro('${emp._id}')">Devolver</button>
       `;
@@ -325,6 +327,9 @@ async function carregarEmprestimos() {
 async function emprestarLivro(livroId) {
   if (!usuarioLogado) return;
 
+  const diasParaDevolucao = document.getElementById('loan-days')?.value;
+  const preco = document.getElementById('loan-price')?.value;
+
   try {
     const response = await fetch(`${API_BASE_URL}/emprestimos`, {
       method: 'POST',
@@ -332,7 +337,7 @@ async function emprestarLivro(livroId) {
         'Content-Type': 'application/json',
         ...getAuthHeaders(),
       },
-      body: JSON.stringify({ livroId }),
+      body: JSON.stringify({ livroId, diasParaDevolucao, preco }),
     });
 
     if (!response.ok) {

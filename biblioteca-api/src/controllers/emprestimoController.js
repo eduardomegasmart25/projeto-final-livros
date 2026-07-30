@@ -7,7 +7,12 @@ const DIAS_PADRAO_DEVOLUCAO = 7;
 // Criar um empréstimo (retirar um livro)
 async function criarEmprestimo(req, res) {
   try {
-    const { livroId, usuarioId: usuarioIdBody, diasParaDevolucao } = req.body;
+    const {
+      livroId,
+      usuarioId: usuarioIdBody,
+      diasParaDevolucao,
+      preco: precoBody,
+    } = req.body;
     const usuarioIdToken = req.usuario.id || req.usuario._id;
     const usuarioId = usuarioIdBody || usuarioIdToken;
 
@@ -33,7 +38,8 @@ async function criarEmprestimo(req, res) {
       return res.status(400).json({ erro: "Não há exemplares disponíveis para empréstimo" });
     }
 
-    const dias = diasParaDevolucao || DIAS_PADRAO_DEVOLUCAO;
+    const dias = Number(diasParaDevolucao) > 0 ? Number(diasParaDevolucao) : DIAS_PADRAO_DEVOLUCAO;
+    const preco = Number(precoBody) >= 0 ? Number(precoBody) : 0;
     const dataDevolucaoPrevista = new Date();
     dataDevolucaoPrevista.setDate(dataDevolucaoPrevista.getDate() + dias);
 
@@ -41,6 +47,7 @@ async function criarEmprestimo(req, res) {
       livro: livro._id,
       usuario: usuario._id,
       dataDevolucaoPrevista,
+      preco,
     });
 
     livro.quantidadeDisponivel -= 1;

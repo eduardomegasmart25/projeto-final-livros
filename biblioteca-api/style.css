@@ -375,6 +375,12 @@ input[type='number']:focus {
   min-width: 0;
 }
 
+.loan-price {
+  font-weight: 700;
+  color: #6b4226;
+  margin-top: 6px;
+}
+
 .admin-grid {
   display: grid;
   gap: 24px;

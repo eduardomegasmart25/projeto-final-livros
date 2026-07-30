@@ -29,6 +29,11 @@ const emprestimoSchema = new mongoose.Schema(
       enum: ["emprestado", "devolvido", "atrasado"],
       default: "emprestado",
     },
+    preco: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   { timestamps: true }
 );
