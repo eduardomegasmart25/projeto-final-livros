@@ -263,13 +263,17 @@ async function carregarLivros(page = 1) {
       card.className = 'livro-card';
       const disponivelLivro = livro.quantidadeDisponivel > 0;
       card.innerHTML = `
-        <h3>${livro.titulo}</h3>
-        <p><strong>Autor:</strong> ${livro.autor}</p>
-        ${livro.capaUrl ? `<img class="livro-cover" src="${livro.capaUrl}" alt="Capa de ${livro.titulo}" />` : ''}
-        <p><strong>Categoria:</strong> ${livro.categoria || '—'}</p>
-        <p><strong>ISBN:</strong> ${livro.isbn || '—'}</p>
-        <p><strong>Disponível:</strong> ${livro.quantidadeDisponivel} de ${livro.quantidadeTotal}</p>
-        <button class="btn-primary" ${!disponivelLivro ? 'disabled' : ''} onclick="emprestarLivro('${livro._id}')">${disponivelLivro ? 'Pegar emprestado' : 'Indisponível'}</button>
+        <div class="livro-card-image">
+          ${livro.capaUrl ? `<img class="livro-cover" src="${livro.capaUrl}" alt="Capa de ${livro.titulo}" />` : '<div class="livro-cover-placeholder">Sem capa</div>'}
+        </div>
+        <div class="livro-card-body">
+          <h3>${livro.titulo}</h3>
+          <p><strong>Autor:</strong> ${livro.autor}</p>
+          <p><strong>Categoria:</strong> ${livro.categoria || '—'}</p>
+          <p><strong>ISBN:</strong> ${livro.isbn || '—'}</p>
+          <p><strong>Disponível:</strong> ${livro.quantidadeDisponivel} de ${livro.quantidadeTotal}</p>
+          <button class="btn-primary" ${!disponivelLivro ? 'disabled' : ''} onclick="emprestarLivro('${livro._id}')">${disponivelLivro ? 'Pegar emprestado' : 'Indisponível'}</button>
+        </div>
       `;
       container.appendChild(card);
     });
