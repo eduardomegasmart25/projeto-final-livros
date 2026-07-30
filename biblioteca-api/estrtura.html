@@ -4,13 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Biblioteca Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <div>
+    <div class="brand">
       <h1>📚 Biblioteca Online</h1>
-      <p id="user-greeting" class="hidden"></p>
+      <p class="subtitle">Gerencie empréstimos, encontre livros e controle seu catálogo com facilidade.</p>
+      <p id="user-greeting" class="hidden user-greeting-inline"></p>
     </div>
     <div class="status-actions">
       <span id="user-status-badge" class="status-badge ativo hidden">Ativo</span>
@@ -24,6 +28,7 @@
         <button id="tab-login" class="tab active">Entrar</button>
         <button id="tab-register" class="tab">Cadastrar</button>
       </div>
+      <p class="card-note">Use seu e-mail para entrar ou cadastre um novo usuário para começar a visitar a biblioteca.</p>
 
       <div id="login-form" class="form-panel">
         <h2>Login</h2>
@@ -68,55 +73,69 @@
     </section>
 
     <section id="app-container" class="container hidden">
+      <div id="page-nav" class="page-nav hidden">
+        <button class="page-btn active" data-page="books">Biblioteca</button>
+        <button class="page-btn" data-page="loans">Meus Empréstimos</button>
+        <button class="page-btn hidden" data-page="admin" id="page-admin-btn">Administração</button>
+      </div>
+
+      <div class="page-note">Use as páginas para navegar entre livros, empréstimos e o painel administrativo.</div>
+
       <section id="secao-alerta" class="card hidden">
         <h2>⚠️ Atenção!</h2>
         <p id="mensagem-alerta"></p>
       </section>
 
-      <section class="card painel-filtro">
-        <div class="filtro-row">
-          <div class="form-group">
-            <label for="search-titulo">Buscar título</label>
-            <input id="search-titulo" type="text" placeholder="Título do livro" />
+      <section id="books-page" class="view-page">
+        <section class="card painel-filtro">
+          <h2>Pesquisar Livros</h2>
+          <div class="filtro-row">
+            <div class="form-group">
+              <label for="search-titulo">Buscar título</label>
+              <input id="search-titulo" type="text" placeholder="Título do livro" />
+            </div>
+            <div class="form-group">
+              <label for="search-autor">Buscar autor</label>
+              <input id="search-autor" type="text" placeholder="Autor" />
+            </div>
+            <div class="form-group">
+              <label for="search-categoria">Buscar categoria</label>
+              <input id="search-categoria" type="text" placeholder="Categoria" />
+            </div>
+            <div class="form-group checkbox-group">
+              <input id="search-disponivel" type="checkbox" />
+              <label for="search-disponivel">Somente disponíveis</label>
+            </div>
+            <button id="btn-search" class="btn-primary">Buscar</button>
           </div>
-          <div class="form-group">
-            <label for="search-autor">Buscar autor</label>
-            <input id="search-autor" type="text" placeholder="Autor" />
+        </section>
+
+        <section class="card">
+          <div class="section-header">
+            <h2>Livros Disponíveis</h2>
+            <div class="pagination-controls">
+              <button id="prev-page" class="btn-secondary">Anterior</button>
+              <span>Página <strong id="current-page">1</strong> de <strong id="total-pages">1</strong></span>
+              <button id="next-page" class="btn-secondary">Próxima</button>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="search-categoria">Buscar categoria</label>
-            <input id="search-categoria" type="text" placeholder="Categoria" />
-          </div>
-          <div class="form-group checkbox-group">
-            <input id="search-disponivel" type="checkbox" />
-            <label for="search-disponivel">Somente disponíveis</label>
-          </div>
-          <button id="btn-search" class="btn-primary">Filtrar</button>
-        </div>
+          <div id="lista-livros" class="grid-livros"></div>
+        </section>
       </section>
 
-      <section class="card">
-        <div class="section-header">
-          <h2>Livros Disponíveis</h2>
-          <div class="pagination-controls">
-            <button id="prev-page" class="btn-secondary">Anterior</button>
-            <span>Página <strong id="current-page">1</strong> de <strong id="total-pages">1</strong></span>
-            <button id="next-page" class="btn-secondary">Próxima</button>
+      <section id="loans-page" class="view-page hidden">
+        <section class="card">
+          <div class="section-header">
+            <h2>Meus Empréstimos</h2>
           </div>
-        </div>
-        <div id="lista-livros" class="grid-livros"></div>
+          <ul id="meus-emprestimos" class="lista-emprestimos"></ul>
+        </section>
       </section>
 
-      <section class="card">
-        <h2>Meus Empréstimos</h2>
-        <ul id="meus-emprestimos" class="lista-emprestimos"></ul>
-      </section>
-
-      <section id="admin-panel" class="card hidden">
-        <h2>Painel de Administração</h2>
-        <div class="admin-grid">
+      <section id="admin-page" class="view-page hidden">
+        <section class="card admin-grid">
           <div class="admin-card">
-            <h3>Cadastrar novo livro</h3>
+            <h3>Adicionar novo livro</h3>
             <div class="form-group">
               <label for="book-titulo">Título</label>
               <input id="book-titulo" type="text" placeholder="Título do livro" />
@@ -150,7 +169,7 @@
             <h3>Gerenciar livros</h3>
             <div id="admin-livros"></div>
           </div>
-        </div>
+        </section>
       </section>
     </section>
   </main>

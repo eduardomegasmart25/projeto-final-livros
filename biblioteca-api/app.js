@@ -1,9 +1,9 @@
-// Substitua pela URL onde sua API está hospedada.
-// Exemplo Render:
-// const API_BASE_URL = 'https://sua-api.onrender.com/api';
-// Exemplo mesma rede local:
-// const API_BASE_URL = 'http://192.168.1.100:3000/api';
-const API_BASE_URL = 'http://localhost:3000/api';
+// A API é acessada automaticamente a partir da origem atual.
+// Se estiver hospedado junto com o backend, o frontend usará o mesmo domínio.
+const DEFAULT_API_BASE_URL = 'https://biblioteca-minhaapp.onrender.com/api';
+const API_BASE_URL = window.location.protocol.startsWith('http')
+  ? `${window.location.origin}/api`
+  : DEFAULT_API_BASE_URL;
 let authToken = localStorage.getItem('bibliotecaToken');
 let usuarioLogado = JSON.parse(localStorage.getItem('bibliotecaUsuario')) || null;
 let currentPage = 1;
@@ -59,6 +59,7 @@ function mostrarLogin() {
   hideElement('user-status-badge');
   hideElement('btn-logout');
   hideElement('user-greeting');
+  hideElement('page-nav');
   showElement('auth-card');
 }
 
@@ -67,7 +68,32 @@ function mostrarApp() {
   showElement('user-status-badge');
   showElement('btn-logout');
   showElement('user-greeting');
+  showElement('page-nav');
   hideElement('auth-card');
+}
+
+function setAppPage(page) {
+  const pages = ['books-page', 'loans-page', 'admin-page'];
+  const pageButtons = document.querySelectorAll('.page-btn');
+
+  pages.forEach((pageId) => {
+    const el = document.getElementById(pageId);
+    if (el) {
+      if (pageId === `${page}-page`) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+      }
+    }
+  });
+
+  pageButtons.forEach((button) => {
+    if (button.dataset.page === page) {
+      button.classList.add('active');
+    } else {
+      button.classList.remove('active');
+    }
+  });
 }
 
 function showError(id, message) {
@@ -93,16 +119,18 @@ function updateUserHeader() {
   if (!usuarioLogado) {
     badge.textContent = '';
     greeting.textContent = '';
+    hideElement('page-admin-btn');
     return;
   }
 
   greeting.textContent = `Olá, ${usuarioLogado.nome} (${usuarioLogado.role})`;
   badge.textContent = 'Conectado';
   badge.className = 'status-badge ativo';
+
   if (usuarioLogado.role === 'bibliotecario') {
-    showElement('admin-panel');
+    showElement('page-admin-btn');
   } else {
-    hideElement('admin-panel');
+    hideElement('page-admin-btn');
   }
 }
 
@@ -520,7 +548,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-login').addEventListener('click', fazerLogin);
   document.getElementById('btn-register').addEventListener('click', registrarUsuario);
   document.getElementById('btn-logout').addEventListener('click', fazerLogout);
-  document.getElementById('btn-search').addEventListener('click', () => carregarLivros(1));
+  document.getElementById('btn-search').addEventListener('click', () => {
+    carregarLivros(1);
+    setAppPage('books');
+  });
   document.getElementById('prev-page').addEventListener('click', () => {
     if (currentPage > 1) carregarLivros(currentPage - 1);
   });
@@ -529,9 +560,20 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('btn-add-book').addEventListener('click', adicionarLivro);
 
+  document.querySelectorAll('.page-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      const page = button.dataset.page;
+      if (page === 'admin' && usuarioLogado?.role !== 'bibliotecario') {
+        return;
+      }
+      setAppPage(page);
+    });
+  });
+
   if (authToken && usuarioLogado) {
     updateUserHeader();
     mostrarApp();
+    setAppPage('books');
     carregarLivros();
     carregarEmprestimos();
     if (usuarioLogado.role === 'bibliotecario') {
