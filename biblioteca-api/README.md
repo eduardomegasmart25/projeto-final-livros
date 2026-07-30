@@ -2,25 +2,28 @@
 
 ## 🎯 Objetivo do projeto
 
-Este projeto tem como finalidade desenvolver uma API REST para o gerenciamento de uma biblioteca, permitindo o cadastro de livros, usuários e empréstimos, com foco em organização, segurança e facilidade de uso.
+Este projeto implementa uma API REST para uma biblioteca completa, com gerenciamento de livros, usuários, empréstimos e relatórios.
 
-A aplicação foi construída com Node.js, Express e MongoDB, seguindo boas práticas de estruturação, autenticação e validação de dados.
+A aplicação foi construída com Node.js, Express e MongoDB, com foco em autenticação, segurança, validação e experiência de uso via frontend estático.
 
 ## ✨ Funcionalidades implementadas
 
 - Cadastro, listagem, busca, atualização e remoção de livros
+- Upload de capa de livro por URL ou por arquivo local
+- Exibição da capa diretamente no catálogo de livros
 - Cadastro, listagem, busca, atualização e remoção de usuários
-- Upload de capa de livro por arquivo ou URL
 - Upload de avatar de usuário
-- Registro de empréstimos e devoluções
-- Controle de disponibilidade de exemplares
-- Histórico de movimentações e relatórios administrativos
-- Autenticação com JWT para login de bibliotecário/usuário
-- Proteção de rotas sensíveis por perfil
-- Paginação nas listagens de livros e usuários
+- Autenticação JWT com login de usuário e bibliotecário
+- Proteção de rotas sensíveis por perfil (bibliotecário)
+- Registro de empréstimos, devoluções e controle de disponibilidade
+- Agrupamento de empréstimos por cliente na visão de bibliotecário
+- Histórico de movimentações da biblioteca
+- Relatórios administrativos com métricas e receita
+- Paginação em listagens de livros e usuários
 - Validação de dados com Joi
+- Fallback para MongoDB em memória caso o MongoDB local não esteja disponível
 - Testes automatizados com Jest + Supertest
-- Configuração para deploy no Render
+- Deploy preparado para Render
 
 ## 🧱 Estrutura do projeto
 
@@ -33,6 +36,9 @@ biblioteca-api/
 ├── postman_collection.json
 ├── tests/
 │   └── api.test.js
+├── estrtura.html
+├── style.css
+├── app.js
 └── src/
     ├── app.js
     ├── config/
@@ -41,20 +47,28 @@ biblioteca-api/
     │   ├── authController.js
     │   ├── emprestimoController.js
     │   ├── livroController.js
+    │   ├── relatorioController.js
+    │   ├── historicoController.js
     │   └── usuarioController.js
     ├── middlewares/
     │   ├── authMiddleware.js
     │   ├── roleMiddleware.js
+    │   ├── uploadMiddleware.js
     │   └── validateMiddleware.js
     ├── models/
     │   ├── Emprestimo.js
     │   ├── Livro.js
+    │   ├── Movimentacao.js
     │   └── Usuario.js
     ├── routes/
     │   ├── authRoutes.js
     │   ├── emprestimoRoutes.js
     │   ├── livroRoutes.js
-    │   └── usuarioRoutes.js
+    │   ├── usuarioRoutes.js
+    │   ├── relatorioRoutes.js
+    │   └── historicoRoutes.js
+    ├── utils/
+    │   └── historico.js
     └── validators/
         └── usuarioValidator.js
 ```
@@ -63,10 +77,10 @@ biblioteca-api/
 
 - Node.js 18 ou superior
 - MongoDB local ou conta no MongoDB Atlas
-- Postman ou Insomnia para testes das rotas
+- Postman ou Insomnia para testes de API
 - Git para versionamento
 
-## 🚀 Passo a passo para execução local
+## 🚀 Como iniciar o projeto
 
 1. Clone o repositório:
    ```bash
@@ -83,7 +97,7 @@ biblioteca-api/
    ```env
    PORT=3000
    MONGO_URI=mongodb://127.0.0.1:27017/biblioteca
-   JWT_SECRET=sua-chave-segura
+   JWT_SECRET=sua-chave-secreta
    NODE_ENV=development
    ```
 
@@ -97,178 +111,155 @@ biblioteca-api/
    npm run dev
    ```
 
-5. A API ficará disponível em:
+5. Abra no navegador:
    ```text
    http://localhost:3000
    ```
 
-## 🧪 Como podem testar
+> Se o MongoDB local não estiver disponível, a aplicação tenta um banco em memória automaticamente.
 
-### Opção 1: teste local
+## 🧪 Como testar
 
-1. Clonar o projeto:
-   ```bash
-   git clone <url-do-repositorio>
-   cd biblioteca-api
-   ```
+### Teste local rápido
 
-2. Instalar dependências:
+1. Instale dependências:
    ```bash
    npm install
    ```
 
-3. Criar o arquivo `.env` com os valores acima.
-
-4. Rodar a API:
+2. Execute o servidor:
    ```bash
    npm start
    ```
 
-5. Usar o Postman/Insomnia para testar as rotas.
+3. Abra `http://localhost:3000` no navegador para acessar a interface.
 
-### Opção 2: testar via deploy
-Se a API já estiver publicada no Render, o grupo pode testar diretamente pela URL gerada, por exemplo:
-```text
-https://seu-app.onrender.com
-```
+4. Use o frontend embutido ou ferramentas como Postman para testar as APIs.
 
-### Fluxo recomendado para testar o projeto
-1. Criar um usuário:
-   ```http
-   POST /api/usuarios
-   ```
-   Body:
-   ```json
-   {
-     "nome": "Ana",
-     "email": "ana@email.com",
-     "senha": "123456",
-     "role": "bibliotecario"
-   }
-   ```
-
-2. Fazer login:
-   ```http
-   POST /api/auth/login
-   ```
-   Body:
-   ```json
-   {
-     "email": "ana@email.com",
-     "senha": "123456"
-   }
-   ```
-
-3. Copiar o token retornado e usar no header:
-   ```http
-   Authorization: Bearer <token>
-   ```
-
-4. Criar um livro:
-   ```http
-   POST /api/livros
-   ```
-
-5. Criar um empréstimo:
-   ```http
-   POST /api/emprestimos
-   ```
-
-### Testes automáticos
-Execute:
+### Rodar testes automatizados
 
 ```bash
 npm test
 ```
 
-Os testes cobrem cenários de login JWT e validação/paginação de listagens.
+## 🔐 Fluxo básico de uso
 
-## 🔐 Autenticação
-
-### Login
-
-Rota:
+### 1. Criar um usuário (bibliotecário)
 ```http
-POST /api/auth/login
+POST /api/usuarios
+Content-Type: application/json
 ```
 
 Body:
 ```json
 {
-  "email": "bibliotecario@email.com",
+  "nome": "Ana",
+  "email": "ana@email.com",
+  "senha": "123456",
+  "role": "bibliotecario"
+}
+```
+
+### 2. Fazer login
+```http
+POST /api/auth/login
+Content-Type: application/json
+```
+
+Body:
+```json
+{
+  "email": "ana@email.com",
   "senha": "123456"
 }
 ```
 
-Resposta:
-```json
-{
-  "mensagem": "Login realizado com sucesso",
-  "token": "...",
-  "usuario": {
-    "id": "...",
-    "nome": "...",
-    "email": "...",
-    "role": "bibliotecario"
-  }
-}
-```
+### 3. Usar o token
 
-Use o token no header:
+Adicione este header nas requisições protegidas:
 ```http
 Authorization: Bearer <token>
 ```
+
+### 4. Cadastrar livro com URL de capa
+```http
+POST /api/livros
+Content-Type: application/json
+Authorization: Bearer <token>
+```
+
+Body:
+```json
+{
+  "titulo": "Dom Casmurro",
+  "autor": "Machado de Assis",
+  "isbn": "1234567890",
+  "categoria": "Clássico",
+  "capaUrl": "https://exemplo.com/capa.jpg",
+  "anoPublicacao": 1899,
+  "quantidadeTotal": 5
+}
+```
+
+### 5. Enviar capa por arquivo
+```http
+PUT /api/livros/:id/capa
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+```
+
+Campo: `capa`
+
+### 6. Atualizar avatar de usuário
+```http
+PUT /api/usuarios/:id/avatar
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+```
+
+Campo: `avatar`
 
 ## 📌 Rotas principais
 
 ### Autenticação
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/api/auth/login` | Faz login e retorna JWT |
-
-### Livros
-| Método | Rota | Descrição |
-|---|---|---|
-| POST | `/api/livros` | Cadastra um livro (apenas bibliotecário) |
-| GET | `/api/livros` | Lista livros com paginação e filtros |
-| GET | `/api/livros/:id` | Busca um livro |
-| PUT | `/api/livros/:id` | Atualiza um livro (apenas bibliotecário) |
-| DELETE | `/api/livros/:id` | Remove um livro (apenas bibliotecário) |
+| POST | `/api/auth/login` | Login e retorno de JWT |
 
 ### Usuários
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/api/usuarios` | Cadastra um usuário |
-| GET | `/api/usuarios` | Lista usuários com paginação |
-| GET | `/api/usuarios/:id` | Busca um usuário |
-| PUT | `/api/usuarios/:id` | Atualiza um usuário |
-| PUT | `/api/usuarios/:id/avatar` | Atualiza avatar do usuário |
-| DELETE | `/api/usuarios/:id` | Remove um usuário |
+| POST | `/api/usuarios` | Cadastra usuário |
+| GET | `/api/usuarios` | Lista usuários (bibliotecário) |
+| GET | `/api/usuarios/:id` | Busca usuário |
+| PUT | `/api/usuarios/:id` | Atualiza usuário |
+| PUT | `/api/usuarios/:id/avatar` | Atualiza avatar de usuário |
+| DELETE | `/api/usuarios/:id` | Remove usuário |
 
 ### Livros
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/api/livros` | Cadastra um livro (aceita `capaUrl`) |
-| GET | `/api/livros` | Lista livros com paginação e filtros |
-| GET | `/api/livros/:id` | Busca um livro |
-| PUT | `/api/livros/:id` | Atualiza um livro |
-| PUT | `/api/livros/:id/capa` | Envia arquivo de capa para um livro |
-| DELETE | `/api/livros/:id` | Remove um livro |
+| POST | `/api/livros` | Cadastra livro (aceita `capaUrl`) |
+| GET | `/api/livros` | Lista livros com filtros |
+| GET | `/api/livros/:id` | Busca livro |
+| PUT | `/api/livros/:id` | Atualiza livro |
+| PUT | `/api/livros/:id/capa` | Envia capa por arquivo |
+| DELETE | `/api/livros/:id` | Remove livro |
 
 ### Empréstimos
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/api/emprestimos` | Registra um empréstimo |
+| POST | `/api/emprestimos` | Registra empréstimo |
 | GET | `/api/emprestimos` | Lista empréstimos |
-| GET | `/api/emprestimos/atrasados` | Lista empréstimos atrasados |
-| GET | `/api/emprestimos/:id` | Busca um empréstimo |
-| PUT | `/api/emprestimos/:id/devolver` | Registra a devolução |
+| GET | `/api/emprestimos/atrasados` | Lista atrasados |
+| GET | `/api/emprestimos/:id` | Busca empréstimo |
+| PUT | `/api/emprestimos/:id/devolver` | Registra devolução |
 
 ### Administração
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/api/historico/movimentacoes` | Lista as movimentações administrativas |
-| GET | `/api/relatorios/estatisticas` | Retorna métricas e receita do sistema |
+| GET | `/api/historico/movimentacoes` | Lista movimentações |
+| GET | `/api/relatorios/estatisticas` | Retorna métricas e receita |
 
 ## 🔎 Exemplos de consulta
 
@@ -308,7 +299,7 @@ MONGO_URI=sua_uri_do_mongodb_atlas
 JWT_SECRET=sua_chave_secreta
 ```
 
-## �🛠️ Tecnologias utilizadas
+## 🛠️ Tecnologias utilizadas
 
 - Node.js
 - Express
@@ -320,5 +311,5 @@ JWT_SECRET=sua_chave_secreta
 
 ## ✅ Conclusão
 
-Este projeto demonstra a implementação de uma API REST funcional, com foco em organização de dados, controle de empréstimos, autenticação segura e testes automatizados, sendo adequado para uso acadêmico e para apresentação em trabalho de curso.
+Projeto com API funcional para biblioteca, incluindo frontend estático, upload de imagens, autenticação segura, histórico e relatórios.
 
